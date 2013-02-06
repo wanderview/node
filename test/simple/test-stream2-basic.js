@@ -451,6 +451,25 @@ test('sync _read ending', function (t) {
   })
 });
 
+test('first readable event', function (t) {
+  var r = new R();
+  r._read = function() {};
+
+  var msg = new Buffer('hello world');
+  var rcv = null;;
+
+  r.once('readable', function() {
+    rcv = r.read(msg.length);
+  });
+
+  r.push(msg);
+
+  process.nextTick(function () {
+    assert.equal(msg, rcv);
+    t.end();
+  });
+});
+
 assert.throws(function() {
   var bad = new R({
     highWaterMark: 10,
